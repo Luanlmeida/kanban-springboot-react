@@ -14,7 +14,7 @@ import com.example.demo.service.UsuarioService;
 
 import jakarta.validation.Valid;
 
-@CrossOrigin(origins = "*")
+@CrossOrigin(origins = "http://localhost:5173")
 @RestController
 @RequestMapping("api/usuarios")
 
@@ -33,14 +33,8 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public Usuario criarUsuario(@RequestBody Usuario novoUsuario) {
+    public Usuario criarUsuario(@Valid @RequestBody Usuario novoUsuario) {
         System.out.println("Garçom recebeu pedido para criar um novo usuário: " + novoUsuario.getNome());
         return usuarioService.salvarUsuario(novoUsuario);
     }
-
-    @PostMapping
-    public Usuario criar(@Valid @RequestBody Usuario usuario) {
-        return usuarioService.salvarUsuario(usuario);
-    }
-
 }
