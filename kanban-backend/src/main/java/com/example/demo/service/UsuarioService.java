@@ -26,6 +26,13 @@ public class UsuarioService {
         return usuarioSalvo;
     }
 
+    public Usuario atualizarStatus(Long id, String novoStatus) {
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        usuario.setStatus(novoStatus);
+        return usuarioRepository.save(usuario);
+    }
+
     public List<Usuario> listarTodos() {
         return usuarioRepository.findAll();
     }
@@ -34,4 +41,7 @@ public class UsuarioService {
         return usuarioRepository.findById(id).orElse(null);
     }
 
+    public void deletarUsuario(Long id) {
+        usuarioRepository.deleteById(id);
+    }
 }

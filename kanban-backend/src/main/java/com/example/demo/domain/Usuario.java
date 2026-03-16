@@ -36,4 +36,6 @@ public class Usuario {
     @Size(min = 6, message = "A senha deve ter no mínimo 6 caracteres")
     @Column(nullable = false)
     private String senha;
+
+    private String status = "A_FAZER";
 }
