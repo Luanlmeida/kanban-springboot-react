@@ -19,13 +19,25 @@ function App() {
 
   const cadastrarUsuario = (e) => {
     e.preventDefault();
-    api.post('/usuarios', { nome: novoNome, email: novoEmail })
+    api.post('/usuarios', {
+      nome: novoNome,
+      email: novoEmail,
+      senha: "123456"
+    })
       .then(() => {
         setNovoNome('');
         setNovoEmail('');
         buscarUsuarios();
       })
-      .catch(err => alert("Erro ao cadastrar! O Java está rodando?"));
+      .catch(err => console.error("Erro no cadastro:", err));
+  };
+
+  const mudarStatus = (id, novoStatus) => {
+    api.patch(`/usuarios/${id}/status`, novoStatus, {
+      headers: { 'Content-Type': 'text/plain' }
+    })
+      .then(() => buscarUsuarios())
+      .catch(err => console.error("Erro ao mover:", err));
   };
 
   const excluirUsuario = (id) => {
@@ -37,67 +49,122 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white p-6 md:p-10 font-sans">
-      <header className="mb-10 flex flex-col lg:flex-row justify-between items-center gap-6 border-b border-slate-800 pb-8">
-        <div>
-          <h1 className="text-4xl font-black text-blue-500 tracking-tighter">KANBAN SYSTEM</h1>
-          <p className="text-slate-500 font-medium">Controle de Fluxo | {usuarios.length} usuários</p>
+    <div className="min-h-screen bg-white text-gray-800 font-sans">
+      {/* CABEÇALHO */}
+      <header className="p-6 border-b border-gray-200">
+        <h1 className="text-2xl font-normal text-gray-800 mb-4">Quadro Kanban da Equipe</h1>
+        
+        <div className="flex items-center gap-4 text-sm mb-6">
+          <span className="font-semibold text-gray-500">FILTROS RÁPIDOS:</span>
+          <button className="text-blue-600 hover:underline">Tarefas Críticas</button>
+          <button className="text-blue-600 hover:underline">Minhas Tarefas</button>
+          <button className="text-blue-600 hover:underline">Atualizadas Recentemente</button>
         </div>
 
-        <form onSubmit={cadastrarUsuario} className="flex flex-wrap gap-3 bg-slate-800 p-4 rounded-2xl border border-slate-700 shadow-xl">
+        {/* FORMULÁRIO DE CADASTRO */}
+        <form onSubmit={cadastrarUsuario} className="flex gap-2">
           <input
-            className="bg-slate-700 p-3 rounded-xl text-sm outline-none focus:ring-2 ring-blue-500 w-full md:w-auto"
-            placeholder="Nome Completo"
+            className="border border-gray-300 p-2 rounded-sm text-sm outline-none focus:border-blue-500 w-64"
+            placeholder="O que precisa ser feito?"
             value={novoNome}
             onChange={(e) => setNovoNome(e.target.value)}
             required
           />
           <input
-            className="bg-slate-700 p-3 rounded-xl text-sm outline-none focus:ring-2 ring-blue-500 w-full md:w-auto"
-            placeholder="E-mail"
+            className="border border-gray-300 p-2 rounded-sm text-sm outline-none focus:border-blue-500 w-48"
+            placeholder="Responsável (E-mail)"
             value={novoEmail}
             onChange={(e) => setNovoEmail(e.target.value)}
             required
           />
-          <button type="submit" className="bg-blue-600 hover:bg-blue-500 px-6 py-3 rounded-xl font-bold transition-all active:scale-95 shadow-lg shadow-blue-900/20">
-            ADICIONAR
+          <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-sm text-sm font-medium transition-colors">
+            Criar Tarefa
           </button>
         </form>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {colunas.map((titulo) => (
-          <div key={titulo} className="bg-slate-800/50 p-6 rounded-3xl border border-slate-800 backdrop-blur-sm min-h-[500px]">
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-sm font-black uppercase tracking-[0.2em] text-slate-400">{titulo}</h2>
-              <span className="bg-slate-700 text-[10px] px-2 py-1 rounded-full text-slate-300 font-bold">{usuarios.length}</span>
-            </div>
+      {/* ÁREA DO BOARD */}
+      <div className="p-6 bg-gray-50 min-h-[calc(100vh-180px)]">
+        <div className="flex flex-col md:flex-row gap-4 h-full items-start">
+          {colunas.map((titulo) => {
+            const statusDaColuna = titulo.toUpperCase().replace(" ", "_");
+            const usuariosFiltrados = usuarios.filter(u => u.status === statusDaColuna);
 
-            <div className="flex flex-col gap-4">
-              {usuarios.map(user => (
-                <div key={user.id} className="bg-slate-800 p-5 rounded-2xl border border-slate-700 hover:border-red-500/30 transition-all shadow-sm group">
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-bold text-slate-100 text-lg leading-tight group-hover:text-blue-400 transition-colors">{user.nome}</p>
-                      <p className="text-sm text-slate-500 mt-1">{user.email}</p>
-                    </div>
-                    { }
-                    <button
-                      onClick={() => excluirUsuario(user.id)}
-                      className="opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-500 transition-all p-1"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                  <div className="mt-4 flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-blue-500"></div>
-                    <span className="text-[10px] font-bold text-slate-500 uppercase">Usuário Ativo</span>
-                  </div>
+            // Cores da borda lateral 
+            let corBordaLateral = "border-l-orange-500";
+            if (statusDaColuna === "FEITO") corBordaLateral = "border-l-green-500";
+            if (statusDaColuna === "FAZENDO") corBordaLateral = "border-l-blue-500";
+
+            return (
+              <div key={titulo} className="bg-gray-100 flex-1 min-w-[300px] border border-gray-200 min-h-[500px]">
+                {/* TÍTULO DA COLUNA */}
+                <div className="p-3 border-b border-gray-200">
+                  <h2 className="text-sm text-gray-600 font-semibold">
+                    <span className="text-gray-400 mr-2">{usuariosFiltrados.length}</span>
+                    {titulo}
+                  </h2>
                 </div>
-              ))}
-            </div>
-          </div>
-        ))}
+
+                {/* LISTA DE CARDS */}
+                <div className="p-2 flex flex-col gap-2">
+                  {usuariosFiltrados.map(user => (
+                    <div key={user.id} className={`bg-white p-3 border border-gray-200 border-l-4 ${corBordaLateral} shadow-sm hover:bg-gray-50 transition-colors group relative`}>
+                      
+                      {/* TOPO DO CARD */}
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex items-center gap-1 text-blue-600 text-sm font-medium">
+                          <span className="text-green-600">☑</span>
+                          <span className="hover:underline cursor-pointer">KAN-{user.id}</span>
+                        </div>
+                        <img 
+                          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(user.nome)}&background=random&color=fff&size=24`} 
+                          alt="Avatar do responsável" 
+                          className="w-6 h-6 rounded-full"
+                        />
+                      </div>
+
+                      {/* MEIO DO CARD */}
+                      <p className="text-gray-800 text-sm mb-4 leading-snug">
+                        {user.nome}
+                      </p>
+
+                      {/* RODAPÉ DO CARD */}
+                      <div className="flex justify-between items-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button 
+                          onClick={() => excluirUsuario(user.id)}
+                          className="text-gray-400 hover:text-red-600 text-xs font-medium"
+                          title="Excluir Tarefa"
+                        >
+                          Deletar
+                        </button>
+
+                        <div className="flex gap-2">
+                          {statusDaColuna !== "A_FAZER" && (
+                            <button 
+                              onClick={() => mudarStatus(user.id, statusDaColuna === "FEITO" ? "FAZENDO" : "A_FAZER")}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs transition-colors font-medium"
+                            >
+                              Anterior
+                            </button>
+                          )}
+                          {statusDaColuna !== "FEITO" && (
+                            <button 
+                              onClick={() => mudarStatus(user.id, statusDaColuna === "A_FAZER" ? "FAZENDO" : "FEITO")}
+                              className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs transition-colors font-medium"
+                            >
+                              Próximo
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
