@@ -17,7 +17,7 @@ Um sistema Full-Stack de gerenciamento de tarefas inspirado na interface corpora
 - **Axios** (Comunicação com a API REST)
 
 ### Backend
-- **Java 17**
+- **Java 21**
 - **Spring Boot** (Spring Web, Spring Data JPA, Validation)
 - **H2 Database** (Banco de dados em memória para testes rápidos)
 - **Padrão MVC/API:** Controllers, Services, Entities e Repositories.
@@ -29,7 +29,7 @@ Um sistema Full-Stack de gerenciamento de tarefas inspirado na interface corpora
 
 ## 🛠️ Como rodar o projeto na sua máquina
 
-Certifique-se de ter o **Java 17+** e o **Node.js** instalados na sua máquina.
+Certifique-se de ter o **Java 21+** e o **Node.js** instalados na sua máquina.
 
 ### 1. Rodando o Backend (Spring Boot)
 1. Abra o terminal na pasta raiz do backend.
