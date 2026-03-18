@@ -40,5 +40,7 @@ O servidor Java iniciará na porta 8080.
 
 ### 2. Rodando o Frontend (React)
 1. Abra um novo terminal na pasta raiz do frontend.
-2. npm run dev
-3. Acesse no seu navegador através do link http://localhost:5173.
+2. Execute o comando:
+   ```bash
+   npm run dev
+3. Acesse no seu navegador através do link http://localhost:5173
