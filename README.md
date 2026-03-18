@@ -36,3 +36,9 @@ Certifique-se de ter o **Java 17+** e o **Node.js** instalados na sua máquina.
 2. Execute o comando:
    ```bash
    ./mvnw spring-boot:run
+O servidor Java iniciará na porta 8080.
+
+### 2. Rodando o Frontend (React)
+1. Abra um novo terminal na pasta raiz do frontend.
+2. npm run dev
+3. Acesse no seu navegador através do link http://localhost:5173.
